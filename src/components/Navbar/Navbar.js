@@ -1,13 +1,16 @@
 import React from 'react'
 
 import { AppBar, Typography, Toolbar, Button, Avatar} from '@material-ui/core';
+
 import {useDispatch} from 'react-redux';
-import useStyles from './styles';
 
 import {Link, useHistory, useLocation} from 'react-router-dom';
-import {LOGOUT} from '../../constants/actionTypes';
 
+import decode from 'jwt-decode';
+
+import {LOGOUT} from '../../constants/actionTypes';
 import memories from '../../images/memories.jpg';
+import useStyles from './styles';
 
 const Navbar = (props)  => {
     const classes = useStyles();
@@ -30,9 +33,16 @@ const Navbar = (props)  => {
     React.useEffect(() => {
         const token = user?.token;
 
+        if(token) {
+            const decodedToken = decode(token);
+
+            if(decodedToken.exp * 1000 < new Date().getTime()) {
+                logout()
+            }
+        };
         // JWT
         setUser(JSON.parse(localStorage.getItem('profile')));
-    }, [location])
+    }, [location]);
 
     return (
         <AppBar className={classes.appBar} position="static" color="inherit">
